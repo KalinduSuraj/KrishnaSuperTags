@@ -859,12 +859,155 @@
             }
         }
     </style>
+    <style id="guidestyle">
+        #guide-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            pointer-events: none
+        }
+
+        #guide-overlay.active {
+            display: block
+        }
+
+        #guide-spotlight {
+            position: absolute;
+            border-radius: 14px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, .55);
+            transition: all .38s cubic-bezier(.4, 0, .2, 1);
+            pointer-events: none;
+            background: transparent
+        }
+
+        #guide-card {
+            position: absolute;
+            background: #fff;
+            border-radius: 18px;
+            padding: 22px 22px 16px;
+            width: 300px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, .22);
+            pointer-events: all;
+            transition: all .35s cubic-bezier(.4, 0, .2, 1);
+            z-index: 9010
+        }
+
+        #guide-card .gstep {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: #ff385c;
+            margin-bottom: 6px
+        }
+
+        #guide-card h3 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #111;
+            line-height: 1.25
+        }
+
+        #guide-card p {
+            margin: 0 0 16px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+            white-space: pre-line
+        }
+
+        .guide-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px
+        }
+
+        .guide-dots {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            max-width: 90px
+        }
+
+        .guide-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: background .2s;
+            flex: none
+        }
+
+        .guide-dot.on {
+            background: #ff385c
+        }
+
+        .gbtn {
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            color: #222;
+            border-radius: 10px;
+            padding: 7px 14px;
+            font: 600 12px 'Noto Sans', system-ui, sans-serif;
+            cursor: pointer;
+            transition: background .15s, border-color .15s
+        }
+
+        .gbtn:hover {
+            border-color: #222
+        }
+
+        .gbtn.gpri {
+            background: #ff385c;
+            border-color: #ff385c;
+            color: #fff
+        }
+
+        .gbtn.gpri:hover {
+            background: #e31c5f;
+            border-color: #e31c5f
+        }
+
+        .gbtn.gskip {
+            border: 0;
+            background: none;
+            color: #aaa;
+            padding: 7px 4px;
+            font-size: 12px
+        }
+
+        .gbtn.gskip:hover {
+            color: #222
+        }
+
+        .guide-pulse {
+            animation: gpulse 1.8s ease-out infinite
+        }
+
+        @keyframes gpulse {
+            0% {
+                box-shadow: 0 0 0 9999px rgba(0, 0, 0, .55), 0 0 0 0 rgba(255, 56, 92, .6)
+            }
+
+            70% {
+                box-shadow: 0 0 0 9999px rgba(0, 0, 0, .55), 0 0 0 10px rgba(255, 56, 92, 0)
+            }
+
+            100% {
+                box-shadow: 0 0 0 9999px rgba(0, 0, 0, .55), 0 0 0 0 rgba(255, 56, 92, 0)
+            }
+        }
+    </style>
 </head>
 
 <body>
     <header>
         <div class="brand"><i></i>Krishna Super</div>
-        <div id="sum"></div><button class="btn pri" id="print">Print</button>
+        <div id="sum"></div><button class="btn" id="guidebtn" onclick="startGuide()">📖 Guide</button><button
+            class="btn pri" id="print">Print</button>
     </header>
     <div class="wrap" id="top">
         <div class="canvas" id="canvas">
@@ -926,17 +1069,20 @@
                 <label class="f"><span>Price</span><input data-f="price" type="number" min="0" step="any"
                         inputmode="decimal" placeholder="e.g. 1990"></label>
                 <label class="f"><span>Pack text <em class="au"><input type="checkbox"
-                                data-f="packAuto">auto</em></span><input data-f="packLabel" placeholder="e.g. 5kg pack"></label>
+                                data-f="packAuto">auto</em></span><input data-f="packLabel"
+                        placeholder="e.g. 5kg pack"></label>
             </div>
             <div class="g2">
                 <label class="f"><span>Price per unit <em class="au"><input type="checkbox"
-                                data-f="unitAuto">auto</em></span><input data-f="unitLabel" placeholder="e.g. Rs.398 / kg"></label>
+                                data-f="unitAuto">auto</em></span><input data-f="unitLabel"
+                        placeholder="e.g. Rs.398 / kg"></label>
                 <label class="f"><span>Top label <em class="au"><input type="checkbox"
-                                data-f="badgeAuto">auto</em></span><input data-f="badge" placeholder="e.g. New Arrival"></label>
+                                data-f="badgeAuto">auto</em></span><input data-f="badge"
+                        placeholder="e.g. New Arrival"></label>
             </div>
             <label class="f"><span>Barcode (12–13 digits) <em class="au"><input type="checkbox"
-                            data-f="bar">show</em></span><input data-f="barcode" inputmode="numeric"
-                    maxlength="13" placeholder="e.g. 8901234567890"></label>
+                            data-f="bar">show</em></span><input data-f="barcode" inputmode="numeric" maxlength="13"
+                    placeholder="e.g. 8901234567890"></label>
             <p class="hint offer">Offer tags: enter old price + amount off, or old price + new price. The other fills
                 in.</p>
         </section>
@@ -946,7 +1092,8 @@
     <div class="sheet">
         <h2>Print sheet</h2>
         <div class="tools">
-            <label class="f w"><span>Store name</span><input data-s="store" readonly style="background:#f5f5f5;color:#888;cursor:not-allowed"></label>
+            <label class="f w"><span>Store name</span><input data-s="store" readonly
+                    style="background:#f5f5f5;color:#888;cursor:not-allowed"></label>
             <label class="f"><span>Currency</span><input data-s="cur"></label>
             <label class="f"><span>Tag width (in)</span><input data-s="tw" type="number" min="1" max="8"
                     step="0.05"></label>
@@ -987,6 +1134,23 @@
             tag</button>
     </div>
     <div id="toast" role="status"></div>
+    <div id="guide-overlay" role="dialog" aria-modal="true" aria-label="Step-by-step guide">
+        <div id="guide-backdrop"></div>
+        <div id="guide-spotlight"></div>
+        <div id="guide-card">
+            <div class="gstep" id="guide-stepnum"></div>
+            <h3 id="guide-title"></h3>
+            <p id="guide-desc"></p>
+            <div class="guide-actions">
+                <button class="gbtn gskip" onclick="closeGuide()">✕ Close</button>
+                <div class="guide-dots" id="guide-dots"></div>
+                <div style="display:flex;gap:6px">
+                    <button class="gbtn" id="guide-prev" onclick="guideStep(-1)">← Back</button>
+                    <button class="gbtn gpri" id="guide-next" onclick="guideStep(1)">Next →</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
         const TYPES = { new: 'New arrival', plain: 'Plain price', discount: 'Normal offer', weekly: 'Weekly offer' };
@@ -1094,7 +1258,8 @@
         const fab = $('#fab'); let tt;
         function closeMenu() { fab.classList.remove('open'); $('#fbtn').setAttribute('aria-expanded', 'false') }
         function toast(m) { const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => e.classList.remove('on'), 1800) }
-        function newTag(type) { const c = cur(); add({ type, unit: c?.unit || 'kg' }); closeMenu(); toast(TYPES[type] + ' tag added'); $('#canvas').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); $('[data-f=name]').focus({ preventScroll: true }) }
+        const SAMPLE = { new: { name: 'Basmathi rice', qty: 5, unit: 'kg', price: 1990, orig: '', barcode: '890123456789', bar: true }, plain: { name: 'Sunflower Oil', qty: 1, unit: 'L', price: 245, orig: '', barcode: '890198765432', bar: true }, discount: { name: 'Toor Dal', qty: 1, unit: 'kg', price: 179, orig: 220, barcode: '890112345678', bar: true }, weekly: { name: 'Sugar', qty: 1, unit: 'kg', price: 55, orig: 70, barcode: '890187654321', bar: true } };
+        function newTag(type) { const c = cur(); const sample = SAMPLE[type] || {}; const t = mk({ type, unit: c?.unit || sample.unit || 'kg', ...sample }); calc(t, 'price'); T.push(t); pick(t.id); closeMenu(); toast(TYPES[type] + ' tag added'); $('#canvas').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); $('[data-f=name]').focus({ preventScroll: true }) }
         $('#fbtn').onclick = e => { e.stopPropagation(); const o = fab.classList.toggle('open'); $('#fbtn').setAttribute('aria-expanded', o) };
         $('#fmenu').onclick = e => { const b = e.target.closest('[data-new]'); if (b) newTag(b.dataset.new) };
         document.addEventListener('click', e => { if (!fab.contains(e.target)) closeMenu() });
@@ -1110,6 +1275,196 @@
         if (!T.length) { const t = mk({ type: 'new', name: 'Basmathi rice', qty: 5, unit: 'kg', price: 1990, orig: '' }); calc(t, 'price'); T.push(t); sel = T[0].id }
         if (!cur()) sel = T[0]?.id;
         sync(); draw();
+
+        /* ===== GUIDED TOUR ===== */
+        const GUIDE_STEPS = [
+            {
+                sel: '#guidebtn',
+                title: 'Welcome to Price Tag Studio! 👋',
+                desc: 'This step-by-step guide shows you exactly how to create every type of price tag and print them. Click Next to start!',
+                pos: 'bottom'
+            },
+            {
+                sel: '#fbtn',
+                title: 'Step 1 – Add a New Tag',
+                desc: 'Tap the red "+ New tag" button (bottom-right). A menu pops up with 4 tag types. Each new tag is pre-filled with sample values so you can see it immediately.',
+                pos: 'top'
+            },
+            {
+                sel: '.tts',
+                title: 'Step 2 – Choose Tag Category',
+                desc: '🟢 New Arrival: For freshly stocked items. Shows a "New Arrival" badge on the top bar.\n\n🟡 Plain Price: A clean, simple everyday price tag with no offer details.\n\n🔴 Normal Offer: Highlights a discount — shows original price with strikethrough and savings badge.\n\n🟠 Weekly Offer: Special weekly deal — works like Normal Offer but has an orange header.',
+                pos: 'bottom'
+            },
+            {
+                sel: '[data-f=name]',
+                title: 'Step 3 – Product Name',
+                desc: 'Type the product name (e.g. "Basmathi rice" or "Sunflower Oil"). As you type, the tag preview updates live. Products you\'ve used before are auto-suggested.',
+                pos: 'bottom'
+            },
+            {
+                sel: '[data-f=qty]',
+                title: 'Step 4 – Pack Size & Unit',
+                desc: 'Enter the quantity (e.g. 5 for a 5kg pack) and choose the unit:\n• kg / g — for dry goods\n• L / ml — for liquids\n• pcs — for items sold by piece\n\nThe price-per-unit label is calculated automatically.',
+                pos: 'bottom'
+            },
+            {
+                sel: '[data-f=price]',
+                title: 'Step 5 – Selling Price',
+                desc: 'Enter the current selling price (e.g. 1990 for Rs.1990). This is the large number displayed on the tag.\n\nFor offer tags: you can also type the old price + discount and the selling price fills in automatically.',
+                pos: 'bottom'
+            },
+            {
+                sel: '.offer',
+                title: 'Step 6 – Old Price & Discount (Offer Tags Only)',
+                desc: 'This section is visible only for 🔴 Normal Offer and 🟠 Weekly Offer tags.\n\n• Old price: what the item used to cost (e.g. 2500)\n• Price off: how much you\'re discounting (e.g. 500)\n\nEnter any two of: old price, discount, new price — the third is filled in automatically!',
+                pos: 'bottom'
+            },
+            {
+                sel: '[data-f=packLabel]',
+                title: 'Step 7 – Pack Label',
+                desc: 'This text appears below the product name (e.g. "5kg pack"). Tick "auto" to generate it from the pack size and unit automatically. Untick to write your own custom label.',
+                pos: 'bottom'
+            },
+            {
+                sel: '[data-f=unitLabel]',
+                title: 'Step 8 – Price Per Unit Label',
+                desc: 'Shows the calculated per-unit cost at the bottom of the tag (e.g. "Rs.398 / kg"). Tick "auto" to calculate it automatically from price and pack size. Untick to type your own.',
+                pos: 'bottom'
+            },
+            {
+                sel: '[data-f=badge]',
+                title: 'Step 9 – Top Badge Label',
+                desc: 'The text shown on the coloured top bar of the tag.\n• New Arrival → "New Arrival"\n• Offer tags → "Save Rs.XXX"\n• Plain → empty\n\nTick "auto" to set it automatically based on tag type. Untick to write your own custom badge text.',
+                pos: 'bottom'
+            },
+            {
+                sel: '[data-f=barcode]',
+                title: 'Step 10 – Barcode',
+                desc: 'Enter a 12 or 13-digit EAN barcode (from the product packaging). Tick "show" to display a scannable barcode strip at the bottom of the tag. Untick to hide it.',
+                pos: 'top'
+            },
+            {
+                sel: '.sw',
+                title: 'Step 11 – Top Bar Colour',
+                desc: 'Pick the header colour for this tag:\n🟡 Yellow → Plain price (default)\n🟢 Green → New Arrival\n🔴 Red → Normal Offer\n🟠 Orange → Weekly Offer\n🔵 Blue / ⚫ Black → custom styles\n\nTick "auto" to match colour to tag type automatically.',
+                pos: 'top'
+            },
+            {
+                sel: '#board',
+                title: 'Step 12 – Live Tag Preview',
+                desc: 'This panel shows your tag exactly as it will print. Every edit you make is reflected here instantly. Use the Zoom slider to zoom in for detail or zoom out to see the full tag.',
+                pos: 'bottom'
+            },
+            {
+                sel: '.cp',
+                title: 'Step 13 – Number of Copies',
+                desc: 'Set how many copies of this tag to print.\n• Use − and + to adjust one at a time\n• Press +5 to quickly add 5 copies\n• Press "Fill page" to automatically fill all remaining slots on the current A4 page',
+                pos: 'top'
+            },
+            {
+                sel: '[data-s=cur]',
+                title: 'Step 14 – Print Sheet Settings',
+                desc: 'Scroll down to configure the print sheet:\n• Currency — the symbol shown on tags (e.g. Rs.)\n• Tag width / height — size of each tag in inches\n• Page — A4 landscape or portrait\n• Margin & Gap — spacing around and between tags\n• Spread / Guides — fill page evenly and show cut lines',
+                pos: 'bottom'
+            },
+            {
+                sel: '#list',
+                title: 'Step 15 – Manage Your Tags',
+                desc: 'The "Your tags" panel lists all tags you\'ve created. You can:\n• Click a tag to select and edit it\n• Use − / + to adjust copies\n• ⧉ to duplicate a tag\n• ✕ to delete a tag\n\nAll your tags are saved automatically in the browser.',
+                pos: 'bottom'
+            },
+            {
+                sel: '#print',
+                title: 'Step 16 – Print! 🖨️',
+                desc: 'Click Print when you\'re ready. In the browser print dialog:\n✅ Paper size: A4\n✅ Scale: 100%\n✅ Margins: None\n✅ Enable "Background graphics"\n\nYour tags will print perfectly sized and colour-accurate!',
+                pos: 'bottom'
+            }
+        ];
+
+        let gIdx = 0, gEl = null;
+
+        function startGuide() {
+            gIdx = 0;
+            document.getElementById('guide-overlay').classList.add('active');
+            renderGuideStep();
+        }
+        function closeGuide() {
+            document.getElementById('guide-overlay').classList.remove('active');
+            gEl = null;
+        }
+        function guideStep(dir) {
+            gIdx = Math.max(0, Math.min(GUIDE_STEPS.length - 1, gIdx + dir));
+            renderGuideStep();
+        }
+
+        function positionGuide() {
+            if (!gEl || !document.getElementById('guide-overlay').classList.contains('active')) return;
+            const step = GUIDE_STEPS[gIdx];
+            const r = gEl.getBoundingClientRect();
+            const pad = 10, vw = window.innerWidth, vh = window.innerHeight;
+            const spotlight = document.getElementById('guide-spotlight');
+            const card = document.getElementById('guide-card');
+            /* spotlight uses fixed positioning – always relative to viewport */
+            spotlight.style.left = (r.left - pad) + 'px';
+            spotlight.style.top = (r.top - pad) + 'px';
+            spotlight.style.width = (r.width + pad * 2) + 'px';
+            spotlight.style.height = (r.height + pad * 2) + 'px';
+            /* card placement: try below, fall back above */
+            const cw = 300, cardH = card.offsetHeight || 230;
+            const spaceBelow = vh - r.bottom - pad;
+            let ct, cl;
+            if (step.pos === 'bottom' && spaceBelow > cardH + 16) {
+                ct = r.bottom + pad + 14;
+            } else {
+                ct = Math.max(8, r.top - pad - cardH - 14);
+            }
+            cl = Math.min(vw - cw - 12, Math.max(12, r.left + r.width / 2 - cw / 2));
+            card.style.left = cl + 'px';
+            card.style.top = ct + 'px';
+        }
+
+        function renderGuideStep() {
+            const step = GUIDE_STEPS[gIdx], total = GUIDE_STEPS.length;
+            document.getElementById('guide-stepnum').textContent = gIdx === 0 ? 'Welcome' : 'Step ' + gIdx + ' of ' + (total - 1);
+            document.getElementById('guide-title').textContent = step.title;
+            document.getElementById('guide-desc').textContent = step.desc;
+            document.getElementById('guide-prev').style.display = gIdx === 0 ? 'none' : '';
+            const nextBtn = document.getElementById('guide-next');
+            if (gIdx === total - 1) { nextBtn.textContent = '✓ Finish'; nextBtn.onclick = closeGuide; }
+            else { nextBtn.textContent = 'Next →'; nextBtn.onclick = function () { guideStep(1); }; }
+            document.getElementById('guide-dots').innerHTML = GUIDE_STEPS.map(function (_, i) {
+                return '<div class="guide-dot' + (i === gIdx ? ' on' : '') + '"></div>';
+            }).join('');
+
+            gEl = document.querySelector(step.sel);
+            const spotlight = document.getElementById('guide-spotlight');
+            if (!gEl) { spotlight.style.opacity = '0'; return; }
+            spotlight.style.opacity = '1';
+
+            /* set fixed positioning once */
+            spotlight.style.position = 'fixed';
+            spotlight.style.animation = 'gpulse 1.8s ease-out infinite';
+            spotlight.style.boxShadow = '0 0 0 9999px rgba(0,0,0,.55),0 0 0 0 rgba(255,56,92,.6)';
+            spotlight.style.borderRadius = '14px';
+            spotlight.style.pointerEvents = 'none';
+            spotlight.style.background = 'transparent';
+            spotlight.style.transition = 'all .38s cubic-bezier(.4,0,.2,1)';
+
+            document.getElementById('guide-card').style.position = 'fixed';
+
+            gEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            /* wait for scroll to settle then position */
+            setTimeout(positionGuide, 120);
+        }
+
+        /* keep guide locked while user scrolls or resizes */
+        window.addEventListener('scroll', positionGuide, { passive: true });
+        window.addEventListener('resize', positionGuide, { passive: true });
+
+        document.getElementById('guide-backdrop').addEventListener('click', closeGuide);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeGuide(); });
+        /* ===== END GUIDE ===== */
     </script>
 </body>
 
