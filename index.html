@@ -1,0 +1,1116 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Krishna Super – Price tag maker</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;800&display=swap">
+    <style id="tagcss">
+        * {
+            box-sizing: border-box
+        }
+
+        .pgw {
+            margin: 0 auto 14px
+        }
+
+        .lbl {
+            color: #6a6a6a;
+            font: 12px 'Noto Sans', Arial, sans-serif;
+            margin: 0 0 4px
+        }
+
+        .page {
+            background: #fff;
+            display: grid;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px #d9d9d9, 0 6px 20px rgba(0, 0, 0, .07);
+            break-after: page
+        }
+
+        .tag {
+            position: relative;
+            background: #fff;
+            color: #111;
+            overflow: hidden;
+            font-family: 'Noto Sans', Arial, sans-serif;
+            cursor: pointer
+        }
+
+        .tg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform-origin: 0 0
+        }
+
+        .guides .tag {
+            outline: .5px dashed #999
+        }
+
+        .tag.sel {
+            box-shadow: inset 0 0 0 2px #ff385c;
+            z-index: 1
+        }
+
+        .tb {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 22px;
+            background: var(--hd);
+            color: var(--fg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+            font-size: 12px
+        }
+
+        .tb span {
+            font-weight: 600
+        }
+
+        .tb b {
+            font-weight: 800;
+            font-size: 11.5px;
+            letter-spacing: .3px
+        }
+
+        .nm {
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            top: 26px;
+            font-weight: 800;
+            line-height: 1.15;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .pk {
+            position: absolute;
+            left: 8px;
+            top: 54px;
+            font-size: 11px;
+            max-width: 76px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .pr {
+            position: absolute;
+            right: 8px;
+            top: 48px;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            line-height: 1
+        }
+
+        .pr small {
+            font-size: 14px;
+            font-weight: 800
+        }
+
+        .pr span {
+            font-weight: 800;
+            letter-spacing: -1px
+        }
+
+        .op {
+            position: absolute;
+            left: 8px;
+            top: 80px;
+            font-size: 14px;
+            color: #555;
+            text-decoration: line-through;
+            text-decoration-color: #e11;
+            text-decoration-thickness: 2px
+        }
+
+        .op small {
+            font-size: 11px
+        }
+
+        .pu {
+            position: absolute;
+            left: 8px;
+            bottom: 6px;
+            font-size: 11px
+        }
+
+        .bc {
+            position: absolute;
+            right: 8px;
+            bottom: 6px;
+            width: 92px;
+            height: 22px
+        }
+
+        * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact
+            }
+
+            .lbl {
+                display: none
+            }
+
+            .pgw {
+                margin: 0
+            }
+
+            .page {
+                box-shadow: none
+            }
+
+            .pgw:last-child .page {
+                break-after: auto
+            }
+
+            .tag.sel {
+                box-shadow: none
+            }
+        }
+    </style>
+    <style id="pgstyle">
+        @page {
+            size: A4 landscape;
+            margin: 0
+        }
+    </style>
+    <style>
+        :root {
+            --bg: #fff;
+            --sf: #f7f7f7;
+            --ink: #222;
+            --mut: #6a6a6a;
+            --ln: #e0e0e0;
+            --ac: #ff385c;
+            color-scheme: light;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        body {
+            margin: 0;
+            font: 14px/1.4 'Noto Sans', system-ui, sans-serif;
+            background: #fff;
+            color: var(--ink)
+        }
+
+        header {
+            position: sticky;
+            top: env(safe-area-inset-top, 0px);
+            z-index: 5;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px;
+            background: #fff;
+            border-bottom: 1px solid var(--ln)
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 17px;
+            color: var(--ac);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .brand i {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            background: var(--ac);
+            display: inline-block
+        }
+
+        #sum {
+            margin-left: auto;
+            color: var(--mut);
+            font-size: 13px
+        }
+
+        .btn {
+            border: 1px solid var(--ln);
+            background: #fff;
+            color: inherit;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font: 600 13px 'Noto Sans', system-ui, sans-serif;
+            cursor: pointer
+        }
+
+        .btn:hover {
+            border-color: var(--ink)
+        }
+
+        .pri {
+            background: var(--ac);
+            border-color: var(--ac);
+            color: #fff
+        }
+
+        .pri:hover {
+            background: #e31c5f;
+            border-color: #e31c5f
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--ink);
+            outline-offset: 2px
+        }
+
+        .wrap {
+            display: grid;
+            grid-template-columns: 1fr 440px;
+            gap: 16px;
+            padding: 16px;
+            max-width: 1500px;
+            margin: 0 auto;
+            align-items: start
+        }
+
+        .wrap section {
+            margin: 0
+        }
+
+        .empty {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 36px 16px;
+            border: 1px dashed var(--ln);
+            border-radius: 16px;
+            color: var(--mut)
+        }
+
+        .empty b {
+            display: block;
+            color: var(--ink);
+            font-size: 16px
+        }
+
+        .sw2 {
+            display: grid;
+            grid-template-columns: 1fr 290px;
+            gap: 16px;
+            align-items: start
+        }
+
+        .stage {
+            min-width: 0
+        }
+
+        .side {
+            position: sticky;
+            top: 72px;
+            max-height: calc(100vh - 88px);
+            overflow: auto
+        }
+
+        .side section {
+            margin: 0
+        }
+
+        section {
+            border: 1px solid var(--ln);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px
+        }
+
+        h2 {
+            margin: 0 0 10px;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .it {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            cursor: pointer
+        }
+
+        .it:hover {
+            background: var(--sf)
+        }
+
+        .it.on {
+            border-color: var(--ink);
+            background: var(--sf)
+        }
+
+        .tx {
+            flex: 1;
+            min-width: 0
+        }
+
+        .tx b,
+        .tx small {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .tx small {
+            color: var(--mut);
+            font-size: 12px
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex: none;
+            display: inline-block;
+            border: 1px solid rgba(0, 0, 0, .15)
+        }
+
+        .st {
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .st span {
+            min-width: 20px;
+            text-align: center;
+            font-weight: 600
+        }
+
+        .st button,
+        .ic {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid var(--ln);
+            background: #fff;
+            color: inherit;
+            cursor: pointer;
+            padding: 0
+        }
+
+        .ic {
+            border: 0;
+            color: var(--mut)
+        }
+
+        .tts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px
+        }
+
+        .tt {
+            border: 1px solid var(--ln);
+            border-radius: 12px;
+            background: #fff;
+            color: inherit;
+            padding: 10px;
+            text-align: left;
+            font: 600 13px 'Noto Sans', system-ui, sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .tt.on {
+            border: 2px solid var(--ink);
+            padding: 9px
+        }
+
+        label.f {
+            display: block;
+            margin-bottom: 10px
+        }
+
+        label.f>span {
+            display: flex;
+            justify-content: space-between;
+            color: var(--mut);
+            font-size: 12px;
+            margin-bottom: 4px
+        }
+
+        .au {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            font-size: 12px;
+            font-style: normal
+        }
+
+        input:not([type=checkbox]):not([type=color]):not([type=range]),
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--ln);
+            border-radius: 10px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit
+        }
+
+        .g2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        .offer {
+            display: none
+        }
+
+        [data-type=discount] .offer,
+        [data-type=weekly] .offer {
+            display: block
+        }
+
+        .hint {
+            color: var(--mut);
+            font-size: 12px;
+            margin: 0
+        }
+
+        .link {
+            background: none;
+            border: 0;
+            color: var(--mut);
+            text-decoration: underline;
+            cursor: pointer;
+            font: inherit;
+            padding: 4px 0
+        }
+
+        .canvas {
+            position: sticky;
+            top: 72px;
+            align-self: start;
+            border: 1px solid var(--ln);
+            border-radius: 16px;
+            padding: 14px
+        }
+
+        .ch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px
+        }
+
+        .zm {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--mut)
+        }
+
+        .zm input {
+            width: 140px;
+            accent-color: var(--ac)
+        }
+
+        .board {
+            border-radius: 12px;
+            background: #fafafa radial-gradient(#cfcfcf 1px, transparent 1px) 0 0/16px 16px;
+            padding: 28px 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            overflow: auto
+        }
+
+        #live .tag,
+        #live .tag.sel {
+            box-shadow: 0 0 0 1px #ddd, 0 8px 24px rgba(0, 0, 0, .12);
+            cursor: default;
+            outline: 0
+        }
+
+        .cf {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 24px;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px
+        }
+
+        .cp {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600
+        }
+
+        .cp input {
+            width: 64px !important;
+            text-align: center;
+            padding: 6px !important;
+            font-weight: 600
+        }
+
+        .cp .st {
+            gap: 6px
+        }
+
+        .cp .st button {
+            width: 32px;
+            height: 32px;
+            font-size: 16px
+        }
+
+        .cp .pl {
+            width: auto !important;
+            border-radius: 16px !important;
+            padding: 0 10px;
+            font-size: 13px
+        }
+
+        .sw {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--mut)
+        }
+
+        .sw button {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #ccc;
+            cursor: pointer;
+            padding: 0
+        }
+
+        .sw input {
+            width: 30px;
+            height: 26px;
+            border: 0;
+            padding: 0;
+            background: none
+        }
+
+        .sheet {
+            border-top: 1px solid var(--ln);
+            padding: 16px;
+            max-width: 1500px;
+            margin: 0 auto
+        }
+
+        .tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 12px;
+            align-items: flex-end;
+            margin-bottom: 14px
+        }
+
+        .tools label.f {
+            margin: 0;
+            width: 118px
+        }
+
+        .tools label.w {
+            width: 160px
+        }
+
+        .tools .au {
+            padding-bottom: 10px
+        }
+
+        .stage {
+            overflow: auto;
+            padding: 4px
+        }
+
+        .pages {
+            transform-origin: top left
+        }
+
+        @media (max-width:900px) {
+            .sw2 {
+                grid-template-columns: 1fr
+            }
+
+            .side {
+                position: static;
+                max-height: none;
+                order: -1
+            }
+
+            .wrap {
+                grid-template-columns: 1fr
+            }
+
+            .canvas {
+                position: static;
+                order: -1
+            }
+
+            #sum {
+                display: none
+            }
+
+            .pri {
+                margin-left: 0
+            }
+
+            header {
+                overflow-x: auto
+            }
+        }
+
+        @media print {
+
+            html,
+            body {
+                background: #fff
+            }
+
+            :root {
+                padding: 0
+            }
+
+            header,
+            .wrap,
+            .tools,
+            .sheet h2,
+            .side,
+            .fab,
+            #toast,
+            .sheet>.hint {
+                display: none !important
+            }
+
+            .sw2 {
+                display: block
+            }
+
+            .sheet {
+                padding: 0;
+                border: 0;
+                max-width: none
+            }
+
+            .stage {
+                padding: 0;
+                overflow: visible
+            }
+
+            .pages {
+                zoom: 1 !important
+            }
+        }
+
+        .fab {
+            position: fixed;
+            right: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px
+        }
+
+        .fb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 56px;
+            padding: 0 22px 0 16px;
+            border: 0;
+            border-radius: 28px;
+            background: var(--ac);
+            color: #fff;
+            font: 700 15px 'Noto Sans', system-ui, sans-serif;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255, 56, 92, .4);
+            transition: transform .15s, background .15s
+        }
+
+        .fb:hover {
+            background: #e31c5f;
+            transform: translateY(-1px)
+        }
+
+        .fb .pl {
+            font-size: 30px;
+            line-height: 1;
+            font-weight: 400;
+            transition: transform .2s
+        }
+
+        .fab.open .pl {
+            transform: rotate(45deg)
+        }
+
+        .fmenu {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end
+        }
+
+        .fab.open .fmenu {
+            display: flex
+        }
+
+        .fmenu button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border: 1px solid var(--ln);
+            border-radius: 24px;
+            background: #fff;
+            color: var(--ink);
+            font: 600 14px 'Noto Sans', system-ui, sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+            animation: up .16s ease both
+        }
+
+        .fmenu button:hover {
+            border-color: var(--ink)
+        }
+
+        @keyframes up {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+        }
+
+        .fab.empty .fb {
+            animation: ring 2s ease-out 3
+        }
+
+        @keyframes ring {
+            0% {
+                box-shadow: 0 8px 24px rgba(255, 56, 92, .4), 0 0 0 0 rgba(255, 56, 92, .5)
+            }
+
+            100% {
+                box-shadow: 0 8px 24px rgba(255, 56, 92, .4), 0 0 0 18px rgba(255, 56, 92, 0)
+            }
+        }
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%);
+            background: #222;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s;
+            z-index: 40
+        }
+
+        #toast.on {
+            opacity: 1
+        }
+
+        @media (prefers-reduced-motion:reduce) {
+            * {
+                animation: none !important;
+                transition: none !important
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="brand"><i></i>Krishna Super</div>
+        <div id="sum"></div><button class="btn pri" id="print">Print</button>
+    </header>
+    <div class="wrap" id="top">
+        <div class="canvas" id="canvas">
+            <div class="ch"><b>Tag preview</b><label class="zm">Zoom <input type="range" id="zoom" min="1" max="4"
+                        step="0.25"><span id="zv"></span></label></div>
+            <div class="board" id="board">
+                <div id="live"></div>
+            </div>
+            <div class="cf">
+                <div class="cp"><span>Copies</span>
+                    <div class="st"><button data-c="m" aria-label="Fewer copies">−</button><input data-f="copies"
+                            type="number" min="0" max="99" inputmode="numeric" aria-label="Copies"><button data-c="p"
+                            aria-label="More copies">+</button><button class="pl" data-c="p5">+5</button></div><button
+                        class="btn" id="fill">Fill page</button>
+                </div>
+                <div class="sw"><span>Top bar</span>
+                    <button data-hd="#ffd21f" style="background:#ffd21f" aria-label="Yellow"></button><button
+                        data-hd="#2fb36d" style="background:#2fb36d" aria-label="Green"></button><button
+                        data-hd="#e5384b" style="background:#e5384b" aria-label="Red"></button><button data-hd="#f08c00"
+                        style="background:#f08c00" aria-label="Orange"></button><button data-hd="#2f7de1"
+                        style="background:#2f7de1" aria-label="Blue"></button><button data-hd="#222222"
+                        style="background:#222" aria-label="Black"></button>
+                    <input type="color" data-f="hd" aria-label="Custom colour"><label class="au"><input type="checkbox"
+                            data-f="hdAuto">auto</label>
+                </div>
+            </div>
+        </div>
+        <section id="form">
+            <h2>Edit tag</h2>
+            <div class="tts">
+                <button class="tt" data-t="new"><i class="dot" style="background:#2fb36d"></i>New arrival</button>
+                <button class="tt" data-t="plain"><i class="dot" style="background:#ffd21f"></i>Plain price</button>
+                <button class="tt" data-t="discount"><i class="dot" style="background:#e5384b"></i>Normal offer</button>
+                <button class="tt" data-t="weekly"><i class="dot" style="background:#f08c00"></i>Weekly offer</button>
+            </div>
+            <label class="f"><span>Product name</span><input data-f="name" list="prods" placeholder="e.g. Basmathi rice"
+                    autocomplete="off"></label>
+            <datalist id="prods"></datalist>
+            <div class="g2">
+                <label class="f"><span>Pack size</span><input data-f="qty" type="number" min="0" step="any"
+                        inputmode="decimal" placeholder="e.g. 5"></label>
+                <label class="f"><span>Unit</span><select data-f="unit">
+                        <option>kg</option>
+                        <option>g</option>
+                        <option>L</option>
+                        <option>ml</option>
+                        <option>pcs</option>
+                    </select></label>
+            </div>
+            <div class="offer">
+                <div class="g2">
+                    <label class="f"><span>Old price</span><input data-f="orig" type="number" min="0" step="any"
+                            inputmode="decimal" placeholder="e.g. 2500"></label>
+                    <label class="f"><span>Price off (amount)</span><input data-f="disc" type="number" min="0"
+                            step="any" inputmode="decimal" placeholder="e.g. 500"></label>
+                </div>
+            </div>
+            <div class="g2">
+                <label class="f"><span>Price</span><input data-f="price" type="number" min="0" step="any"
+                        inputmode="decimal" placeholder="e.g. 1990"></label>
+                <label class="f"><span>Pack text <em class="au"><input type="checkbox"
+                                data-f="packAuto">auto</em></span><input data-f="packLabel" placeholder="e.g. 5kg pack"></label>
+            </div>
+            <div class="g2">
+                <label class="f"><span>Price per unit <em class="au"><input type="checkbox"
+                                data-f="unitAuto">auto</em></span><input data-f="unitLabel" placeholder="e.g. Rs.398 / kg"></label>
+                <label class="f"><span>Top label <em class="au"><input type="checkbox"
+                                data-f="badgeAuto">auto</em></span><input data-f="badge" placeholder="e.g. New Arrival"></label>
+            </div>
+            <label class="f"><span>Barcode (12–13 digits) <em class="au"><input type="checkbox"
+                            data-f="bar">show</em></span><input data-f="barcode" inputmode="numeric"
+                    maxlength="13" placeholder="e.g. 8901234567890"></label>
+            <p class="hint offer">Offer tags: enter old price + amount off, or old price + new price. The other fills
+                in.</p>
+        </section>
+        <div class="empty" id="empty"><b>No tags yet</b>Tap the + button at the bottom right to add your first tag.
+        </div>
+    </div>
+    <div class="sheet">
+        <h2>Print sheet</h2>
+        <div class="tools">
+            <label class="f w"><span>Store name</span><input data-s="store" readonly style="background:#f5f5f5;color:#888;cursor:not-allowed"></label>
+            <label class="f"><span>Currency</span><input data-s="cur"></label>
+            <label class="f"><span>Tag width (in)</span><input data-s="tw" type="number" min="1" max="8"
+                    step="0.05"></label>
+            <label class="f"><span>Tag height (in)</span><input data-s="th" type="number" min="0.8" max="8"
+                    step="0.05"></label>
+            <label class="f"><span>Page</span><select data-s="orient">
+                    <option value="landscape">A4 landscape</option>
+                    <option value="portrait">A4 portrait</option>
+                </select></label>
+            <label class="f"><span>Margin (mm)</span><input data-s="margin" type="number" min="0" max="30"></label>
+            <label class="f"><span>Min gap (mm)</span><input data-s="gap" type="number" min="0" max="10"
+                    step="0.5"></label>
+            <label class="au"><input type="checkbox" data-s="spread"> Spread tags to fill page</label>
+            <label class="au"><input type="checkbox" data-s="guides"> Cutting guides</label>
+        </div>
+        <div class="sw2">
+            <div class="stage">
+                <div class="pages" id="pages"></div>
+            </div>
+            <aside class="side">
+                <section>
+                    <h2>Your tags</h2>
+                    <div id="list"></div><button class="link" id="clr">Remove all tags</button>
+                </section>
+            </aside>
+        </div>
+        <p class="hint">Printing: choose A4, scale 100%, margins “None”, and tick “Background graphics” if your browser
+            asks. “Download HTML” saves a print-ready file.</p>
+    </div>
+    <div class="fab empty" id="fab">
+        <div class="fmenu" id="fmenu">
+            <button data-new="weekly"><i class="dot" style="background:#f08c00"></i>Weekly offer</button>
+            <button data-new="discount"><i class="dot" style="background:#e5384b"></i>Normal offer</button>
+            <button data-new="new"><i class="dot" style="background:#2fb36d"></i>New arrival</button>
+            <button data-new="plain"><i class="dot" style="background:#ffd21f"></i>Plain price</button>
+        </div>
+        <button class="fb" id="fbtn" aria-expanded="false" aria-label="Add a new tag"><span class="pl">+</span>New
+            tag</button>
+    </div>
+    <div id="toast" role="status"></div>
+    <script>
+        const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+        const TYPES = { new: 'New arrival', plain: 'Plain price', discount: 'Normal offer', weekly: 'Weekly offer' };
+        const TH = { new: '#2fb36d', plain: '#ffd21f', discount: '#e5384b', weekly: '#f08c00' };
+        const Ld = ["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"];
+        const Pd = ["LLLLLL", "LLGLGG", "LLGGLG", "LLGGGL", "LGLLGG", "LGGLLG", "LGGGLL", "LGLGLG", "LGLGGL", "LGGLGL"];
+        const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(2);
+        const uid = () => Math.random().toString(36).slice(2, 8);
+        const fg = h => { const n = parseInt((h || '#fff').slice(1), 16), r = n >> 16, g = n >> 8 & 255, b = n & 255; return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#111' : '#fff' };
+        const mk = (o = {}) => ({ id: uid(), type: 'plain', name: '', qty: '', unit: 'kg', packLabel: '', packAuto: true, price: '', orig: '', disc: '', unitAuto: true, unitLabel: '', badge: '', badgeAuto: true, hd: '#ffd21f', hdAuto: true, barcode: '890123456789', bar: true, copies: 1, ...o });
+        let S = { store: 'KRISHNA SUPER', cur: 'Rs.', tw: 2.75, th: 1.5, orient: 'landscape', margin: 8, gap: 0, spread: true, guides: true, zoom: 2 }, T = [], sel = null, lib = {}, PER = 1;
+
+        function ean(c) {
+            c = (c || '').replace(/\D/g, ''); if (c.length == 12) { let s = 0; for (let i = 0; i < 12; i++)s += c[i] * (i % 2 ? 3 : 1); c += (10 - s % 10) % 10 }
+            if (c.length != 13) return ''; const cm = x => [...x].map(v => 1 - v).join(''), rv = x => [...x].reverse().join('');
+            let b = '101', p = Pd[c[0]]; for (let i = 1; i < 7; i++) { const l = Ld[c[i]]; b += p[i - 1] == 'L' ? l : rv(cm(l)) }
+            b += '01010'; for (let i = 7; i < 13; i++)b += cm(Ld[c[i]]); b += '101';
+            let o = '', i = 0; while (i < 95) { if (b[i] == '1') { let j = i; while (b[j] == '1') j++; o += `<rect x="${i}" width="${j - i}" height="1"/>`; i = j } else i++ } return o
+        }
+        function perUnit(t) {
+            const q = +t.qty, p = +t.price; if (!(q > 0) || t.price === '') return '';
+            const m = { kg: [q, 'kg'], g: [q / 1000, 'kg'], L: [q, 'L'], ml: [q / 1000, 'L'], pcs: [q, 'pc'] }[t.unit];
+            return `${S.cur}${fmt(Math.round(p / m[0] * 100) / 100)} / ${m[1]}`
+        }
+        function calc(t, f) {
+            if (f == 'orig' || f == 'disc') { if (t.orig !== '' && t.disc !== '') t.price = Math.max(0, Math.round((t.orig - t.disc) * 100) / 100) }
+            else if (f == 'price' && t.orig !== '' && t.price !== '') t.disc = Math.max(0, Math.round((t.orig - t.price) * 100) / 100);
+            if (f == 'packLabel') t.packAuto = false; if (f == 'badge') t.badgeAuto = false; if (f == 'unitLabel') t.unitAuto = false; if (f == 'hd') t.hdAuto = false;
+            if (t.hdAuto) t.hd = TH[t.type];
+            if (t.packAuto) t.packLabel = t.qty ? `${t.qty}${t.unit} pack` : '';
+            if (t.badgeAuto) t.badge = { new: 'New Arrival', weekly: 'weekly offer', plain: '', discount: t.disc > 0 ? `Save ${S.cur}${fmt(+t.disc)}` : 'Special offer' }[t.type];
+            if (t.unitAuto) t.unitLabel = perUnit(t)
+        }
+
+        function tagHTML(t) {
+            const off = (t.type == 'discount' || t.type == 'weekly') && t.orig > t.price && t.price !== '';
+            const p = t.price === '' ? '' : fmt(+t.price), n = t.name || 'Product name', L = p.length;
+            const ps = L <= 4 ? 64 : L == 5 ? 52 : L == 6 ? 44 : 36, ns = n.length <= 16 ? 22 : n.length <= 22 ? 18 : n.length <= 28 ? 15 : 13;
+            const b = t.bar ? ean(t.barcode) : '', Wp = S.tw * 96, Hp = S.th * 96, k = Math.min(Wp / 264, Hp / 144);
+            return `<div class="tag${t.id == sel ? ' sel' : ''}" data-id="${t.id}" style="width:${S.tw}in;height:${S.th}in;--hd:${esc(t.hd)};--fg:${fg(t.hd)}"><div class="tg" style="width:${Wp / k}px;height:${Hp / k}px;transform:scale(${k})"><div class="tb"><span>${esc(t.badge)}</span><b>${esc(S.store)}</b></div><div class="nm" style="font-size:${ns}px">${esc(n)}</div><div class="pk">${esc(t.packLabel)}</div><div class="pr"><small>${esc(S.cur)}</small><span style="font-size:${ps}px">${p}</span></div>${off ? `<div class="op"><small>${esc(S.cur)}</small>${fmt(+t.orig)}</div>` : ''}<div class="pu">${esc(t.unitLabel)}</div>${b ? `<svg class="bc" viewBox="0 0 95 1" preserveAspectRatio="none">${b}</svg>` : ''}</div></div>`
+        }
+
+        function draw() {
+            const L = S.orient == 'landscape', PW = L ? 297 : 210, PH = L ? 210 : 297, m = +S.margin || 0, g = +S.gap || 0, tw = S.tw * 25.4, th = S.th * 25.4;
+            const cols = Math.max(1, Math.floor((PW - 2 * m + g) / (tw + g))), rows = Math.max(1, Math.floor((PH - 2 * m + g) / (th + g))); PER = cols * rows;
+            const all = T.flatMap(t => Array(Math.max(0, parseInt(t.copies) || 0)).fill(t)), n = Math.max(1, Math.ceil(all.length / PER));
+            $('#pgstyle').textContent = `@page{size:A4 ${S.orient};margin:0}`;
+            let html = ''; for (let p = 0; p < n; p++) {
+                html += `<div class="pgw" style="width:${PW}mm"><div class="lbl">Page ${p + 1} of ${n}</div><div class="page${S.guides ? ' guides' : ''}" style="width:${PW}mm;height:${PH - 1}mm;padding:${m}mm;grid-template-columns:repeat(${cols},${S.tw}in);grid-auto-rows:${S.th}in;gap:${g}mm;${S.spread ? 'justify-content:space-between;align-content:space-between' : 'justify-content:center;align-content:center'}">${all.slice(p * PER, p * PER + PER).map(tagHTML).join('')}</div></div>`
+            }
+            $('#pages').innerHTML = html;
+            $('#pages').style.zoom = Math.min(1, ($('.stage').clientWidth - 10) / (PW * 96 / 25.4));
+            $('#sum').textContent = `${cols} × ${rows} = ${PER} tags per page · ${all.length} tags · ${n} page${n > 1 ? 's' : ''}`;
+            $('#list').innerHTML = T.length ? T.map(t => `<div class="it${t.id == sel ? ' on' : ''}" data-id="${t.id}"><i class="dot" style="background:${esc(t.hd)}"></i><div class="tx"><b>${esc(t.name || 'Untitled')}</b><small>${TYPES[t.type]}${t.price !== '' ? ' · ' + esc(S.cur) + fmt(+t.price) : ''}</small></div><div class="st"><button data-a="m" aria-label="Fewer copies">−</button><span>${t.copies}</span><button data-a="p" aria-label="More copies">+</button></div><button class="ic" data-a="d" title="Duplicate" aria-label="Duplicate">⧉</button><button class="ic" data-a="x" title="Delete" aria-label="Delete">✕</button></div>`).join('') : '<p class="hint">No tags yet. Press “New tag” to start.</p>';
+            $('#form').style.display = $('#canvas').style.display = T.length ? '' : 'none'; $('#empty').style.display = T.length ? 'none' : ''; $('#fab').classList.toggle('empty', !T.length);
+            const c = cur(); $('#live').innerHTML = c ? tagHTML(c) : '';
+            const avail = $('#board').clientWidth - 32, z = Math.min(S.zoom, Math.max(.5, avail / (S.tw * 96))); $('#live').style.zoom = z; $('#zv').textContent = Math.round(S.zoom * 100) + '%';
+            $('#prods').innerHTML = Object.values(lib).map(x => `<option value="${esc(x.name)}">`).join('');
+            try { localStorage.setItem('tagstudio2', JSON.stringify({ S, T, sel })); localStorage.setItem('tagstudio2-lib', JSON.stringify(lib)) } catch (e) { }
+        }
+        const cur = () => T.find(t => t.id == sel);
+        function sync(skip) {
+            $$('[data-s]').forEach(el => { const v = S[el.dataset.s]; el.type == 'checkbox' ? el.checked = !!v : el.value = v }); $('#zoom').value = S.zoom;
+            const t = cur(); if (!t) return; $('#top').dataset.type = t.type;
+            $$('#top [data-f]').forEach(el => { if (el === skip) return; const v = t[el.dataset.f]; el.type == 'checkbox' ? el.checked = !!v : el.value = v ?? '' });
+            $$('.tt').forEach(b => b.classList.toggle('on', b.dataset.t == t.type))
+        }
+        function pick(id) { sel = id; sync(); draw() }
+        function add(o) { const t = mk(o); calc(t, 'type'); T.push(t); pick(t.id) }
+
+        $('#top').addEventListener('input', e => {
+            const el = e.target, f = el.dataset.f, t = cur(); if (!f || !t) return;
+            t[f] = el.type == 'checkbox' ? el.checked : el.type == 'number' ? (el.value === '' ? '' : +el.value) : el.value; calc(t, f);
+            if (t.name && t.price !== '') lib[t.name.toLowerCase()] = { name: t.name, type: t.type, qty: t.qty, unit: t.unit, price: t.price, orig: t.orig, barcode: t.barcode };
+            sync(el); draw()
+        });
+        $('#top').addEventListener('change', e => {
+            const el = e.target, t = cur(); if (el.dataset.f != 'name' || !t) return;
+            const x = lib[t.name.toLowerCase()]; if (!x) return; Object.assign(t, { type: x.type, qty: x.qty, unit: x.unit, price: x.price, orig: x.orig, barcode: x.barcode, packAuto: true });
+            t.disc = t.orig !== '' && t.price !== '' ? Math.max(0, Math.round((t.orig - t.price) * 100) / 100) : ''; calc(t, 'qty'); sync(); draw()
+        });
+        $('#top').addEventListener('click', e => {
+            const t = cur(), c = e.target.closest('[data-c]')?.dataset.c, h = e.target.closest('[data-hd]')?.dataset.hd, b = e.target.closest('.tt'); if (!t) return;
+            if (c) { const n = +t.copies || 0; t.copies = Math.min(99, Math.max(0, c == 'm' ? n - 1 : c == 'p' ? n + 1 : n + 5)) }
+            else if (h) { t.hd = h; t.hdAuto = false }
+            else if (b) { t.type = b.dataset.t; calc(t, 'type') } else return;
+            sync(); draw()
+        });
+        $$('[data-s]').forEach(el => el.addEventListener('input', () => {
+            const k = el.dataset.s;
+            if (el.type == 'checkbox') S[k] = el.checked; else if (el.type == 'number') { if (!(+el.value > 0) && k != 'margin' && k != 'gap') return; S[k] = +el.value } else S[k] = el.value;
+            if (k == 'cur') T.forEach(t => calc(t, 'x')); draw()
+        }));
+        $('#zoom').addEventListener('input', e => { S.zoom = +e.target.value; draw() });
+        $('#list').addEventListener('click', e => {
+            const row = e.target.closest('.it'); if (!row) return; const t = T.find(x => x.id == row.dataset.id), a = e.target.closest('[data-a]')?.dataset.a;
+            if (a == 'm') t.copies = Math.max(0, (+t.copies || 0) - 1); else if (a == 'p') t.copies = Math.min(99, (+t.copies || 0) + 1);
+            else if (a == 'd') { const c = { ...t, id: uid() }; T.splice(T.indexOf(t) + 1, 0, c); return pick(c.id) }
+            else if (a == 'x') { T = T.filter(x => x !== t); return pick(T[0]?.id) }
+            else return pick(t.id);
+            sync(); draw()
+        });
+        $('#pages').addEventListener('click', e => { const g = e.target.closest('.tag'); if (g) pick(g.dataset.id) });
+        const fab = $('#fab'); let tt;
+        function closeMenu() { fab.classList.remove('open'); $('#fbtn').setAttribute('aria-expanded', 'false') }
+        function toast(m) { const e = $('#toast'); e.textContent = m; e.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => e.classList.remove('on'), 1800) }
+        function newTag(type) { const c = cur(); add({ type, unit: c?.unit || 'kg' }); closeMenu(); toast(TYPES[type] + ' tag added'); $('#canvas').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); $('[data-f=name]').focus({ preventScroll: true }) }
+        $('#fbtn').onclick = e => { e.stopPropagation(); const o = fab.classList.toggle('open'); $('#fbtn').setAttribute('aria-expanded', o) };
+        $('#fmenu').onclick = e => { const b = e.target.closest('[data-new]'); if (b) newTag(b.dataset.new) };
+        document.addEventListener('click', e => { if (!fab.contains(e.target)) closeMenu() });
+        document.addEventListener('keydown', e => { if (e.key == 'Escape') closeMenu() });
+        $('#clr').onclick = () => { if (T.length && confirm('Remove all tags?')) { T = []; sel = null; draw() } };
+        $('#fill').onclick = () => { const t = cur(); if (!t) return; const tot = T.reduce((a, x) => a + Math.max(0, parseInt(x.copies) || 0), 0), add = (PER - tot % PER) % PER; t.copies = Math.min(99, (+t.copies || 0) + add); sync(); draw() };
+        $('#print').onclick = () => window.print();
+
+        addEventListener('resize', draw);
+
+        try { const d = JSON.parse(localStorage.getItem('tagstudio2') || 'null'); if (d && d.T && d.T.length) { S = { ...S, ...d.S }; T = d.T; sel = d.sel } } catch (e) { }
+        try { lib = JSON.parse(localStorage.getItem('tagstudio2-lib') || '{}') } catch (e) { lib = {} }
+        if (!T.length) { const t = mk({ type: 'new', name: 'Basmathi rice', qty: 5, unit: 'kg', price: 1990, orig: '' }); calc(t, 'price'); T.push(t); sel = T[0].id }
+        if (!cur()) sel = T[0]?.id;
+        sync(); draw();
+    </script>
+</body>
+
+</html>
